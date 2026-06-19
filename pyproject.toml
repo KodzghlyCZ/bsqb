@@ -1,0 +1,78 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bsqb"
+version = "0.1.0"
+description = "Type-safe query builder for Brave Search operators"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "bsqb contributors" }]
+keywords = [
+    "brave",
+    "brave-search",
+    "search",
+    "query-builder",
+    "web-search",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.8",
+    "pytest>=8.0",
+    "pytest-cov>=4.1",
+    "ruff>=0.4",
+]
+
+[project.urls]
+Homepage = "https://github.com/kodzghly/bsqb"
+Documentation = "https://github.com/kodzghly/bsqb#readme"
+Repository = "https://github.com/kodzghly/bsqb"
+Issues = "https://github.com/kodzghly/bsqb/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bsqb"]
+
+[tool.hatch.build.targets.sdist]
+only-include = ["src/bsqb", "README.md", "LICENSE", "pyproject.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+packages = ["bsqb"]
+
+[tool.coverage.run]
+source = ["bsqb"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 95
+show_missing = true
