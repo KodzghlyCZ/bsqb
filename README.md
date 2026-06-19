@@ -1,9 +1,10 @@
 # bsqb
 
-[![CI](https://github.com/kodzghly/bsqb/actions/workflows/ci.yml/badge.svg)](https://github.com/kodzghly/bsqb/actions/workflows/ci.yml)
+[![CI](https://github.com/KodzghlyCZ/bsqb/actions/workflows/ci.yml/badge.svg)](https://github.com/KodzghlyCZ/bsqb/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/bsqb.svg)](https://pypi.org/project/bsqb/)
 [![Python versions](https://img.shields.io/pypi/pyversions/bsqb.svg)](https://pypi.org/project/bsqb/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Sponsor](https://img.shields.io/badge/Sponsor-❤-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/KodzghlyCZ)
 
 **bsqb** (Brave Search Query Builder) is a type-safe, zero-dependency Python library for constructing [Brave Search](https://search.brave.com) query strings using the official search operators.
 
@@ -294,6 +295,10 @@ Create a GitHub release with tag `v0.1.0` to trigger publication.
 - [Brave Search Operators (API docs)](https://api-dashboard.search.brave.com/documentation/resources/search-operators)
 - [Brave Search Operators (help page)](https://search.brave.com/help/operators)
 - [Brave Web Search API](https://api-dashboard.search.brave.com/app/documentation/web-search)
+
+## Support
+
+If **bsqb** is useful to you, consider [sponsoring on GitHub](https://github.com/sponsors/KodzghlyCZ) — it helps keep the project maintained.
 
 ## License
 
