@@ -71,6 +71,13 @@ request = urllib.request.Request(
 
 Operators can be placed anywhere in the query string, matching Brave Search behavior.
 
+Most operator methods accept a single value or a list/tuple of values:
+
+```python
+Query("AI startup").exclude(["google", "microsoft", "amazon"])
+Query("news").site(["reuters.com", "bloomberg.com"])
+```
+
 ## Examples
 
 ### Official documentation examples
@@ -87,14 +94,7 @@ Query("recettes cuisine").loc("ca").lang("fr").build()
 # recettes cuisine loc:ca lang:fr
 
 # Competitive analysis
-(
-    Query("AI startup")
-    .exclude("google")
-    .exclude("microsoft")
-    .exclude("amazon")
-    .exclude("meta")
-    .build()
-)
+Query("AI startup").exclude(["google", "microsoft", "amazon", "meta"]).build()
 # AI startup -google -microsoft -amazon -meta
 
 # Technical documentation
@@ -137,6 +137,7 @@ Query("brave search").not_(Query().site("brave.com")).build()
 # Combine multiple queries
 combine_and(Query("visa").loc("gb"), Query().lang("en")).build()
 combine_or(Query().site("reuters.com"), Query().site("bloomberg.com")).build()
+Query("news").site(["reuters.com", "bloomberg.com"]).build()
 ```
 
 ### Advanced usage
@@ -288,7 +289,7 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
 ```
 
-Create a GitHub release with tag `v0.1.0` to trigger publication.
+Create a GitHub release with tag `v0.2.0` to trigger publication.
 
 ## References
 

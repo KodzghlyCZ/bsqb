@@ -54,6 +54,10 @@ class TestInclusionExclusion:
         assert str(Query("office").exclude("microsoft")) == "office -microsoft"
 
     def test_multiple_exclusions(self) -> None:
+        q = Query("AI startup").exclude(["google", "microsoft"])
+        assert q.render() == "AI startup -google -microsoft"
+
+    def test_multiple_exclusions_chaining_still_works(self) -> None:
         q = Query("AI startup").exclude("google").exclude("microsoft")
         assert q.render() == "AI startup -google -microsoft"
 
@@ -98,6 +102,18 @@ class TestFieldOperators:
 
     def test_site_normalizes_url(self) -> None:
         assert str(Query().site("https://www.github.com/")) == "site:github.com"
+
+    def test_multiple_sites(self) -> None:
+        q = Query("news").site(["reuters.com", "bloomberg.com"])
+        assert q.render() == "news site:reuters.com site:bloomberg.com"
+
+    def test_multiple_sites_tuple(self) -> None:
+        q = Query().site(("github.com", "gitlab.com"))
+        assert q.render() == "site:github.com site:gitlab.com"
+
+    def test_multiple_includes(self) -> None:
+        q = Query("gpu").include(["freesync", "g-sync"])
+        assert q.render() == "gpu +freesync +g-sync"
 
 
 class TestLogicalOperators:
@@ -160,13 +176,7 @@ class TestDocumentationExamples:
         assert q.render() == "recettes cuisine loc:ca lang:fr"
 
     def test_competitive_analysis(self) -> None:
-        q = (
-            Query("AI startup")
-            .exclude("google")
-            .exclude("microsoft")
-            .exclude("amazon")
-            .exclude("meta")
-        )
+        q = Query("AI startup").exclude(["google", "microsoft", "amazon", "meta"])
         assert q.render() == "AI startup -google -microsoft -amazon -meta"
 
     def test_technical_documentation(self) -> None:

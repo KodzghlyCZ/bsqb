@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable
+
 from bsqb.exceptions import EmptyQueryError
 from bsqb.nodes import (
     BinaryLogical,
@@ -21,10 +23,13 @@ from bsqb.validation import validate_query
 
 __all__ = [
     "Query",
+    "ValueOrValues",
     "phrase",
     "raw",
     "term",
 ]
+
+ValueOrValues = str | Iterable[str]
 
 
 def term(value: str) -> Term:
@@ -114,71 +119,115 @@ class Query:
     def _logical(self, operator: LogicalOperator, other: Query) -> Query:
         return Query(_node=BinaryLogical(operator, self._node, other._node))
 
+    def _append_many(
+        self,
+        values: ValueOrValues,
+        factory: Callable[[str], Node],
+    ) -> Query:
+        if isinstance(values, str):
+            return self._append(factory(values))
+        result = self
+        for value in values:
+            result = result._append(factory(value))
+        return result
+
+    def _normalize_site(self, domain: str) -> str:
+        normalized = domain.removeprefix("https://").removeprefix("http://")
+        return normalized.removeprefix("www.").rstrip("/")
+
     # --- Content terms -------------------------------------------------
 
-    def term(self, value: str) -> Query:
-        """Append a plain search term."""
-        return self._append(Term(value))
+    def term(self, value: ValueOrValues) -> Query:
+        """Append one or more plain search terms."""
+        return self._append_many(value, Term)
 
-    def phrase(self, value: str) -> Query:
-        """Append an exact phrase match."""
-        return self._append(Phrase(value))
+    def phrase(self, value: ValueOrValues) -> Query:
+        """Append one or more exact phrase matches."""
+        return self._append_many(value, Phrase)
 
-    def include(self, value: str) -> Query:
-        """Force inclusion of a term (+term)."""
-        return self._append(Include(value))
+    def include(self, value: ValueOrValues) -> Query:
+        """Force inclusion of one or more terms (+term)."""
+        return self._append_many(value, Include)
 
-    def exclude(self, value: str) -> Query:
-        """Exclude a term (-term)."""
-        return self._append(Exclude(value))
+    def exclude(self, value: ValueOrValues) -> Query:
+        """Exclude one or more terms (-term)."""
+        return self._append_many(value, Exclude)
 
-    def raw(self, value: str) -> Query:
-        """Append a raw query fragment."""
-        return self._append(Raw(value))
+    def raw(self, value: ValueOrValues) -> Query:
+        """Append one or more raw query fragments."""
+        return self._append_many(value, Raw)
 
     # --- Field operators -----------------------------------------------
 
-    def ext(self, extension: str) -> Query:
+    def ext(self, extension: ValueOrValues) -> Query:
         """Filter by file extension (ext:)."""
-        return self._append(Field(FieldOperator.EXT, extension.lstrip(".")))
+        return self._append_many(
+            extension,
+            lambda value: Field(FieldOperator.EXT, value.lstrip(".")),
+        )
 
-    def filetype(self, filetype: str) -> Query:
+    def filetype(self, filetype: ValueOrValues) -> Query:
         """Filter by file type (filetype:)."""
-        return self._append(Field(FieldOperator.FILETYPE, filetype.lstrip(".")))
+        return self._append_many(
+            filetype,
+            lambda value: Field(FieldOperator.FILETYPE, value.lstrip(".")),
+        )
 
-    def intitle(self, value: str) -> Query:
+    def intitle(self, value: ValueOrValues) -> Query:
         """Search in page title (intitle:)."""
-        return self._append(Field(FieldOperator.INTITLE, value))
+        return self._append_many(
+            value,
+            lambda v: Field(FieldOperator.INTITLE, v),
+        )
 
-    def inbody(self, value: str) -> Query:
+    def inbody(self, value: ValueOrValues) -> Query:
         """Search in page body (inbody:)."""
-        return self._append(Field(FieldOperator.INBODY, value))
+        return self._append_many(
+            value,
+            lambda v: Field(FieldOperator.INBODY, v),
+        )
 
-    def inpage(self, value: str) -> Query:
+    def inpage(self, value: ValueOrValues) -> Query:
         """Search in title or body (inpage:)."""
-        return self._append(Field(FieldOperator.INPAGE, value))
+        return self._append_many(
+            value,
+            lambda v: Field(FieldOperator.INPAGE, v),
+        )
 
-    def lang(self, code: str) -> Query:
+    def lang(self, code: ValueOrValues) -> Query:
         """Filter by language ISO 639-1 code (lang:)."""
-        return self._append(Field(FieldOperator.LANG, code.lower()))
+        return self._append_many(
+            code,
+            lambda value: Field(FieldOperator.LANG, value.lower()),
+        )
 
-    def language(self, code: str) -> Query:
+    def language(self, code: ValueOrValues) -> Query:
         """Alias for lang() using the language: operator."""
-        return self._append(Field(FieldOperator.LANGUAGE, code.lower()))
+        return self._append_many(
+            code,
+            lambda value: Field(FieldOperator.LANGUAGE, value.lower()),
+        )
 
-    def loc(self, code: str) -> Query:
+    def loc(self, code: ValueOrValues) -> Query:
         """Filter by country ISO 3166-1 alpha-2 code (loc:)."""
-        return self._append(Field(FieldOperator.LOC, code.lower()))
+        return self._append_many(
+            code,
+            lambda value: Field(FieldOperator.LOC, value.lower()),
+        )
 
-    def location(self, code: str) -> Query:
+    def location(self, code: ValueOrValues) -> Query:
         """Alias for loc() using the location: operator."""
-        return self._append(Field(FieldOperator.LOCATION, code.lower()))
+        return self._append_many(
+            code,
+            lambda value: Field(FieldOperator.LOCATION, value.lower()),
+        )
 
-    def site(self, domain: str) -> Query:
-        """Limit results to a domain (site:)."""
-        normalized = domain.removeprefix("https://").removeprefix("http://")
-        normalized = normalized.removeprefix("www.").rstrip("/")
-        return self._append(Field(FieldOperator.SITE, normalized))
+    def site(self, domain: ValueOrValues) -> Query:
+        """Limit results to one or more domains (site:)."""
+        return self._append_many(
+            domain,
+            lambda value: Field(FieldOperator.SITE, self._normalize_site(value)),
+        )
 
     # --- Logical operators ---------------------------------------------
 

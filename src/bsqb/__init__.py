@@ -1,6 +1,14 @@
 """Brave Search query builder (bsqb)."""
 
-from bsqb.builder import Query, combine_and, combine_or, phrase, raw, term
+from bsqb.builder import (
+    Query,
+    ValueOrValues,
+    combine_and,
+    combine_or,
+    phrase,
+    raw,
+    term,
+)
 from bsqb.exceptions import BsqbError, EmptyQueryError, QueryValidationError
 from bsqb.nodes import (
     BinaryLogical,
@@ -41,6 +49,7 @@ __all__ = [
     "Raw",
     "Sequence",
     "Term",
+    "ValueOrValues",
     "combine_and",
     "combine_or",
     "count_words",
@@ -50,4 +59,4 @@ __all__ = [
     "validate_query",
 ]
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
